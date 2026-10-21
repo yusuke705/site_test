@@ -1,7 +1,6 @@
 import random
-import streamlit as st
 
-# サイゼリヤのメニューリスト
+# サイゼリヤの代表的なメニューと価格のリスト（例）
 menu = [
     # 前菜・サラダ
     {"name": "小エビのサラダ", "price": 350},
@@ -18,7 +17,7 @@ menu = [
     {"name": "野菜ペーストのミラノ風ドリア", "price": 400},
     {"name": "ミニフィセル", "price": 170},
     {"name": "ガーリックトースト", "price": 220},
-    # パスタ・ドリア
+    # パリア・ドリア
     {"name": "ミラノ風ドリア", "price": 300},
     {"name": "タラコソースシシリー風", "price": 400},
     {"name": "パルマ風スパゲッティ", "price": 400},
@@ -36,10 +35,16 @@ menu = [
 
 
 def saizeriya_gacha(budget=1000, tolerance=150):
+  """サイゼリヤ1000円ガチャを実行する関数
+
+  budget: 目標金額 (デフォルト1000円) tolerance: 許容する誤差の範囲（例: 予算の上下150円以内におさめる）
+  """
   best_combination = []
   best_diff = float("inf")
 
+  # ランダムな組み合わせを何回か試して、もっとも予算に近いものを探す
   for _ in range(10000):
+    # メニューをシャッフルして上から順に選んでみる
     shuffled_menu = menu.copy()
     random.shuffle(shuffled_menu)
 
@@ -47,57 +52,45 @@ def saizeriya_gacha(budget=1000, tolerance=150):
     current_total = 0
 
     for item in shuffled_menu:
+      # 予算を超えない、または許容範囲内であれば追加
       if current_total + item["price"] <= budget + tolerance:
         current_combination.append(item)
         current_total += item["price"]
 
+        # 予算ぴったりになったら即終了
         if current_total == budget:
           break
 
+    # 今回の組み合わせの予算との差分を計算
     diff = abs(budget - current_total)
+
+    # より良い（予算に近い）組み合わせがあれば更新
     if diff < best_diff:
       best_diff = diff
       best_combination = current_combination
 
+      # ぴったり予算通りならループを抜ける
       if diff == 0:
         break
 
   return best_combination
 
 
-# --- Webアプリの画面レイアウト ---
-st.title("🎰 サイゼリヤ 1000円ガチャ")
-st.write("ボタンを押すと、予算に合わせたおすすめのメニューをランダムで提案します！")
+# ガチャを回す
+if __name__ == "__main__":
+  print("🎰 サイゼリヤ1000円ガチャを回しています...\n")
+  result = saizeriya_gacha(budget=1000, tolerance=100)
 
-# サイドバーで設定を変更できるようにする
-st.sidebar.header("ガチャの設定")
-budget = st.sidebar.slider(
-    "目標予算（円）", min_value=500, max_value=3000, value=1000, step=100
-)
-tolerance = st.sidebar.slider(
-    "許容誤差（円）", min_value=0, max_value=300, value=100, step=50
-)
+  total_price = sum(item["price"] for item in result)
 
-# ガチャを回すボタン
-if st.button("ガチャを回す！", type="primary"):
-  with st.spinner("メニューを選定中..."):
-    result = saizeriya_gacha(budget=budget, tolerance=tolerance)
-    total_price = sum(item["price"] for item in result)
-
-  st.subheader("【本日のご注文内容】")
+  print("【本日のご注文内容】")
+  print("-" * 30)
   for item in result:
-    st.write(f"- {item['name']}：**{item['price']}円**")
+    print(f"- {item['name']} ({item['price']}円)")
+  print("-" * 30)
+  print(f"合計金額: **{total_price}円**")
 
-  st.markdown("---")
-
-  # 金額の表示とメトリクス
-  st.metric(
-      label="合計金額",
-      value=f"{total_price}円",
-      delta=f"{budget - total_price}円 (差分)",
-  )
-
-  if total_price <= budget:
-    st.success(f"予算内です！お釣りは {budget - total_price}円 です！🎉")
+  if total_price <= 1000:
+    print(f"お釣りは {1000 - total_price}円 です！")
   else:
-    st.warning(f"予算より {total_price - budget}円 オーバーしちゃいました！💦")
+    print(f"予算より {total_price - 1000}円 オーバーしちゃいました！")

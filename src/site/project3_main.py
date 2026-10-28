@@ -121,7 +121,7 @@ class calc:
 # =====================================================================
 
 st.set_page_config(
-    page_title="学食ガチャ",
+    page_title="新潟大学の学食ガチャ",
     page_icon="🎰",
     layout="centered",
 )

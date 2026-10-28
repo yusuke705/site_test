@@ -17,4 +17,8 @@ Menu_list = [("焼豚玉子丼(中)", 583, 524, 24.7),
 MENU_IMAGES = {
     "かけうどん": "images/kake_udon.png",
     "カレーライス(中)": "images/curry_rice.png",
+    "焼豚玉子丼(中)":"images/yakibuta.jpg",
+    "海老天うどん":"images/ebiten_udon.png",
+    "海老天そば":"images/ebiten_soba.png",
+    "かけそば":"images/kake_soba.png",
 }
